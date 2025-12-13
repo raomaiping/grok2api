@@ -36,11 +36,17 @@ RUN mkdir -p /app/logs /app/data/temp/image /app/data/temp/video
 
 # 复制应用代码和配置文件
 COPY app/ ./app/
-COPY data/setting.toml ./data/setting.toml
 COPY main.py .
 
-# 创建默认的 token.json 文件
-RUN echo '{"ssoNormal": {}, "ssoSuper": {}}' > /app/data/token.json
+# 将 setting.toml 复制为默认配置(作为备份)
+COPY data/setting.toml ./data/setting.toml.default
+
+# 创建默认的 token.json 模板(作为备份)
+RUN echo '{"ssoNormal": {}, "ssoSuper": {}}' > /app/data/token.json.default
+
+# 复制启动脚本
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 # 删除 Python 字节码和缓存
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -48,4 +54,5 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 EXPOSE 8000
 
-CMD ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# 使用启动脚本作为入口点
+ENTRYPOINT ["docker-entrypoint.sh"]

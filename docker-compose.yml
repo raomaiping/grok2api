@@ -1,10 +1,14 @@
 services:
   grok2api:
     image: ghcr.io/chenyme/grok2api:latest
+    container_name: grok2api
+    restart: unless-stopped
     ports:
       - "8000:8000"
     volumes:
+      # 数据持久化卷 - 存储 token.json 和 setting.toml
       - grok_data:/app/data
+      # 日志目录映射到本地(可选)
       - ./logs:/app/logs
     environment:
       # =====存储模式: file, mysql 或 redis=====
@@ -15,5 +19,8 @@ services:
       ## MySQL格式: mysql://user:password@host:port/database
       ## Redis格式: redis://host:port/db 或 redis://user:password@host:port/db
 
+      # 命名卷定义
+      # 注意: 执行 docker compose down -v 会删除此卷及其数据
+      # 如需保留数据,请使用 docker compose down (不带 -v 参数)
 volumes:
   grok_data:
