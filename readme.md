@@ -65,7 +65,7 @@ curl https://你的服务器地址/v1/chat/completions \
 ```yaml
 services:
   grok2api:
-    image: ghcr.io/raomaiping/grok2api:latest
+    image: ghcr.io/chenyme/grok2api:latest
     ports:
       - "8000:8000"
     volumes:
