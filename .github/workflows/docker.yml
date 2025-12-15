@@ -12,6 +12,8 @@ on:
 
 env:
   REGISTRY: ghcr.io
+  # 使用仓库全名作为镜像名
+  # 如果遇到权限问题，可能是旧包未删除，需要先删除旧包或修改包名
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:

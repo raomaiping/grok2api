@@ -1,0 +1,49 @@
+name: Cleanup GHCR Package
+
+# 这是一个一次性工作流，用于清理旧的 GHCR 包
+# 使用方式: 手动触发此工作流，然后删除此文件
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: '操作类型'
+        required: true
+        type: choice
+        options:
+          - check
+          - delete
+        default: 'check'
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      # 注意: 删除包需要 delete:packages 权限，但 GITHUB_TOKEN 可能没有此权限
+      # 建议通过 Web UI 手动删除
+    
+    steps:
+      - name: Check package info
+        if: inputs.action == 'check'
+        run: |
+          echo "检查 GHCR 包信息..."
+          echo "包名: ${{ github.repository }}"
+          echo ""
+          echo "如需删除包，请访问:"
+          echo "https://github.com/users/${{ github.repository_owner }}/packages/container/${{ github.event.repository.name }}/settings"
+          echo ""
+          echo "或使用脚本:"
+          echo "python scripts/cleanup-ghcr-package.py --token YOUR_TOKEN --delete"
+      
+      - name: Delete package (需要手动操作)
+        if: inputs.action == 'delete'
+        run: |
+          echo "⚠️  注意: GITHUB_TOKEN 可能没有删除包的权限"
+          echo "建议通过 Web UI 手动删除:"
+          echo "https://github.com/users/${{ github.repository_owner }}/packages/container/${{ github.event.repository.name }}/settings"
+          echo ""
+          echo "或使用 Personal Access Token 运行脚本:"
+          echo "python scripts/cleanup-ghcr-package.py --token YOUR_TOKEN --delete"
+
